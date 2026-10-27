@@ -50,3 +50,17 @@ test('localStorage に保存された TODO が最初から表示される', () =
   expect(screen.getByText(/残り\s*0\s*件/)).toBeInTheDocument()
 })
 
+afterEach(() => {
+  jest.restoreAllMocks()
+})
+
+test('すべて削除：キャンセルしたら何も消えない', async () => {
+  const user = userEvent.setup()
+  localStorage.setItem('todos', JSON.stringify([{ id: '1', text: '牛乳を買う', done: false }]))
+  jest.spyOn(window, 'confirm').mockReturnValue(false)
+  render(<TodoApp />)
+  await user.click(screen.getByRole('button', { name: 'すべて削除' }))
+  expect(window.confirm).toHaveBeenCalledWith('すべての TODO を削除しますか？')
+  expect(screen.getByText('牛乳を買う')).toBeInTheDocument()
+})
+
